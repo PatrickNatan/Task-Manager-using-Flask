@@ -42,27 +42,36 @@ jobs:
       - name: Perform Bandit Analysis
         uses: PyCQA/bandit-action@v1
 
-  dependecy-check:
+  dependency_check:
+    needs: build
     runs-on: ubuntu-latest
-    name: dependecy-check
+    name: Dependency-Check
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build project with Maven
-        run: mvn clean install
-      - name: Depcheck
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
-        id: Depcheck
+        id: Dependency-Check
         with:
           project: "Task-Manager-using-Flask"
           path: "."
           format: "HTML"
           out: "reports"
           args: >
+            --scan "**/*.py"
+            --scan "requirements.txt"
             --failOnCVSS 7
             --enableRetired
-      - name: Upload Test results
-        uses: actions/upload-artifact@master
+      - name: Upload Dependency-Check results
+        uses: actions/upload-artifact@v3
         with:
-          name: Depcheck report
+          name: Dependency-Check report
           path: ${{github.workspace}}/reports
