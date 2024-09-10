@@ -32,7 +32,7 @@ jobs:
       - name: Run tests
         run: pytest $(find . -name dummy.py)
 
-  analyze:
+  bandit:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -41,3 +41,28 @@ jobs:
     steps:
       - name: Perform Bandit Analysis
         uses: PyCQA/bandit-action@v1
+
+  dependecy-check:
+    runs-on: ubuntu-latest
+    name: dependecy-check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build project with Maven
+        run: mvn clean install
+      - name: Depcheck
+        uses: dependency-check/Dependency-Check_Action@main
+        id: Depcheck
+        with:
+          project: "Task-Manager-using-Flask"
+          path: "."
+          format: "HTML"
+          out: "reports"
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+      - name: Upload Test results
+        uses: actions/upload-artifact@master
+        with:
+          name: Depcheck report
+          path: ${{github.workspace}}/reports
