@@ -31,3 +31,18 @@ jobs:
         run: ls -R
       - name: Run tests
         run: pytest $(find . -name dummy.py)
+
+  security_check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install bandit
+        run: pip install bandit
+      - name: Run bandit
+        run: bandit -r . -f custom --msg-template "{abspath}:{line}: {severity}: {test_id}: {msg}"
+        
