@@ -27,5 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest
+      - name: List directory structure
+        run: ls -R
       - name: Run tests
-        run: pytest /tests/dummy.py
+        run: pytest $(find . -name dummy.py)
