@@ -3,8 +3,7 @@
 Via docker
 
 ```
-docker build -t hdb-python .
-docker run -p 5000:5000 hdb-python
+docker-compose up
 ```
 
 Pipeline
