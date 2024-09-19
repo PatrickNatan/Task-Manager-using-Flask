@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.x"
       - name: Install dependencies
@@ -40,7 +40,7 @@ jobs:
       contents: read
     steps:
       - name: Perform Bandit Analysis
-        uses: PyCQA/bandit-action@v1
+        uses: PyCQA/bandit-action@v4
 
   dependency_check:
     needs: build
@@ -50,7 +50,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.x"
       - name: Install dependencies
@@ -71,7 +71,7 @@ jobs:
             --failOnCVSS 7
             --enableRetired
       - name: Upload Dependency-Check results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Dependency-Check report
           path: ${{github.workspace}}/reports
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Build Docker image
         run: docker build -t flask-app .
@@ -96,7 +96,7 @@ jobs:
           target: "http://localhost:5000"
 
       - name: Upload ZAP Report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ZAP Report
           path: zap_report.html
