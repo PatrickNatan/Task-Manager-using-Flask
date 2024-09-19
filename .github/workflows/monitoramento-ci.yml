@@ -1,0 +1,68 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.7'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest
+
+      - name: Static code analysis
+        run: |
+          bandit -r .
+          dependency-check --project "Task Manager" -s .
+
+      - name: Deploy application
+        run: |
+          # Add your deployment steps here
+
+  post_deployment_monitoring:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Filebeat is running
+        run: |
+          systemctl status filebeat || sudo systemctl start filebeat
+          systemctl status filebeat
+          
+      - name: Verify Logstash connection
+        run: |
+          # Verify if logs are being sent to Logstash
+          curl -X GET "http://localhost:9600/_node/stats?pretty"
+
+      - name: Setup Elastic Alerts (Optional)
+        run: |
+          # You can configure alerts using Elasticsearch API here
+          curl -X POST "localhost:9200/_watcher/watch/force_brute_watch" \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "trigger": { "schedule": { "interval": "10s" }},
+            "input": {
+              "search": {
+                "request": {
+                  "indices": ["logs-*"],
+                  "body": {
+                    "query": { "match": { "message": "failed login" }}
+                  }
+                }
+              }
+            },
+            "condition": { "compare": { "ctx.payload.hits.total": { "gte": 5 }}},
+            "actions": { "send_email": { "email": { "to": "admin@example.com", "subject": "Brute Force Detected" }}}
+          }'
