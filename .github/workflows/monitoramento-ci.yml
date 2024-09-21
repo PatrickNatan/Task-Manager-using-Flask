@@ -18,8 +18,10 @@ jobs:
           python-version: '3.7'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest bandit dependency-check
+          
       - name: Run tests
         run: pytest
 
@@ -36,6 +38,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Install Filebeat and Logstash
+        run: |
+          sudo apt-get update
+          sudo apt-get install filebeat logstash -y
+
       - name: Check if Filebeat is running
         run: |
           systemctl status filebeat || sudo systemctl start filebeat
@@ -43,12 +50,10 @@ jobs:
           
       - name: Verify Logstash connection
         run: |
-          # Verify if logs are being sent to Logstash
           curl -X GET "http://localhost:9600/_node/stats?pretty"
 
       - name: Setup Elastic Alerts (Optional)
         run: |
-          # You can configure alerts using Elasticsearch API here
           curl -X POST "localhost:9200/_watcher/watch/force_brute_watch" \
           -H 'Content-Type: application/json' \
           -d '{
