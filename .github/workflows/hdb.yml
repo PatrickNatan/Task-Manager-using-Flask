@@ -1,9 +1,17 @@
 name: HdB
 on:
   push:
-    branches: ["master"]
+    branches:
+      - master
+      - dev
+      - staging
+      - production
   pull_request:
-    branches: ["master"]
+    branches:
+      - master
+      - dev
+      - staging
+      - production
 
 jobs:
   build:
@@ -129,3 +137,4 @@ jobs:
       - name: Deploy the app
         run: |
           echo "Deploying the app"
+          # ETAPAS PARA DEPLOY DA APP
