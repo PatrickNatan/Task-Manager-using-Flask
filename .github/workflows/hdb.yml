@@ -77,6 +77,7 @@ jobs:
           path: ${{github.workspace}}/reports
 
   owasp_zap:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -96,7 +97,7 @@ jobs:
           target: "http://localhost:5000"
 
       - name: Upload ZAP Report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ZAP Report
           path: zap_report.html
