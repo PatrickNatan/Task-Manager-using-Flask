@@ -1,5 +1,5 @@
-from todo_project import create_app, db
-from todo_project.models import User, Task
+from todo_project.todo_project import create_app, db
+from todo_project.todo_project.models import User, Task
 
 @pytest.fixture(scope='module')
 def test_client():
@@ -29,14 +29,13 @@ def init_database(test_client):
 
     db.drop_all()
 
-# tests/test_models.py
-from todo_project.models import User, Task
-
+# Testando o modelo User
 def test_new_user():
     user = User(username='testuser', password='testpassword')
     assert user.username == 'testuser'
     assert user.password == 'testpassword'
 
+# Testando o modelo Task
 def test_new_task():
     task = Task(content='Test task', user_id=1)
     assert task.content == 'Test task'
@@ -54,3 +53,4 @@ def test_create_task(test_client, init_database):
                                 follow_redirects=True)
     assert response.status_code == 200
     assert b"Task created successfully" in response.data
+
